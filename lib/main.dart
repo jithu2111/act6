@@ -47,6 +47,32 @@ class CounterWidget extends StatefulWidget {
 class CounterWidgetState extends State<CounterWidget> {
   int _counter = 0;
 
+  void _incrementCounter() {
+    setState(() {
+      if (_counter < 100) {
+        _counter++;
+        if (_counter == 100) {
+          // Will implement dialog in next commit
+          print('Launch Ready!');
+        }
+      }
+    });
+  }
+
+  void _decrementCounter() {
+    setState(() {
+      if (_counter > 0) {
+        _counter--;
+      }
+    });
+  }
+
+  void _resetCounter() {
+    setState(() {
+      _counter = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,9 +97,32 @@ class CounterWidgetState extends State<CounterWidget> {
         ),
       ),
       body: Center(
-        child: Text(
-          'Counter: $_counter',
-          style: Theme.of(context).textTheme.headlineMedium,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Counter: $_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: _incrementCounter,
+                  child: const Text('INCREMENT'),
+                ),
+                ElevatedButton(
+                  onPressed: _decrementCounter,
+                  child: const Text('DECREMENT'),
+                ),
+                ElevatedButton(
+                  onPressed: _resetCounter,
+                  child: const Text('RESET'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
