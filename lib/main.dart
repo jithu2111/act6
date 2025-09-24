@@ -79,6 +79,35 @@ class CounterWidgetState extends State<CounterWidget> {
     return 'SYSTEM STATUS';
   }
 
+  Widget _buildControlButton(String label, IconData icon, Color color, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 24),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -252,8 +281,64 @@ class CounterWidgetState extends State<CounterWidget> {
               const SizedBox(height: 24),
 
 
+              // Control Buttons
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Mission Controls',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildControlButton(
+                              'IGNITE',
+                              Icons.local_fire_department,
+                              const Color(0xFF4CAF50),
+                              _incrementCounter,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildControlButton(
+                              'ABORT',
+                              Icons.warning,
+                              const Color(0xFFFF5722),
+                              _decrementCounter,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildControlButton(
+                              'RESET',
+                              Icons.refresh,
+                              const Color(0xFF2196F3),
+                              _resetCounter,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
               Container(
-                height: 120,
+                height: 150,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
@@ -261,7 +346,7 @@ class CounterWidgetState extends State<CounterWidget> {
                 ),
                 child: Center(
                   child: Text(
-                    'Control Buttons - Next Commit',
+                    'System Status Dashboard - Next Commit',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
