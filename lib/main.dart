@@ -47,7 +47,6 @@ class CounterWidget extends StatefulWidget {
 class CounterWidgetState extends State<CounterWidget> {
   int _counter = 0;
 
-
   void _incrementCounter() {
     setState(() {
       final next = (_counter + 1).clamp(0, 100);
@@ -70,6 +69,10 @@ class CounterWidgetState extends State<CounterWidget> {
     });
   }
 
+  // Status color rules aligned with number text:
+  // - Red when counter == 0
+  // - Green when counter > 50
+  // - Yellow for 1..50
   Color _getCounterColor() {
     if (_counter == 0) {
       return const Color(0xFFE53935); // Red
@@ -110,13 +113,14 @@ class CounterWidgetState extends State<CounterWidget> {
     }
   }
 
+  // Number text color (same rules)
   Color _getNumberColor() {
     if (_counter == 0) {
-      return const Color(0xFFE53935); // Red
+      return const Color(0xFFE53935);
     } else if (_counter > 50) {
-      return const Color(0xFF43A047); // Green
+      return const Color(0xFF43A047);
     } else {
-      return const Color(0xFFFFC107); // Yellow (for 1..50)
+      return const Color(0xFFFFC107);
     }
   }
 
@@ -139,6 +143,7 @@ class CounterWidgetState extends State<CounterWidget> {
     );
   }
 
+  // Reusable control button
   Widget _buildControlButton(String label, IconData icon, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
@@ -168,6 +173,7 @@ class CounterWidgetState extends State<CounterWidget> {
     );
   }
 
+  // System status legend card
   Widget _buildSystemStatusCard() {
     return Card(
       elevation: 4,
@@ -237,24 +243,31 @@ class CounterWidgetState extends State<CounterWidget> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 9,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
+        SizedBox(
+          width: 56,
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 9,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     final Color statusColor = _getCounterColor();
     final Color numberColor = _getNumberColor();
+
+    // for gradient uses below
+    final Color statusColorLight1 = statusColor.withOpacity(0.10);
+    final Color statusColorLight2 = statusColor.withOpacity(0.05);
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -276,88 +289,12 @@ class CounterWidgetState extends State<CounterWidget> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    _getStatusIcon(),
-                    size: 48,
-                    color: statusColor,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    _getStatusText(),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: statusColor,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '$_counter',
-                    style: TextStyle(
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold,
-                      color: numberColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 40),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _incrementCounter,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
-                  ),
-                  child: const Text('IGNITE'),
-                ),
-                ElevatedButton(
-                  onPressed: _decrementCounter,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFF5722),
-                  ),
-                  child: const Text('ABORT'),
-                ),
-                ElevatedButton(
-                  onPressed: _resetCounter,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2196F3),
-                  ),
-                  child: const Text('RESET'),
-                ),
-              ],
-            ),
-          ],
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
-            ),
-          ),
-        ),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
+              // Mission Status Card (big, pretty)
               Card(
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -370,8 +307,8 @@ class CounterWidgetState extends State<CounterWidget> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        _getCounterColor().withValues(alpha: 0.1),
-                        _getCounterColor().withValues(alpha: 0.05),
+                        statusColorLight1,
+                        statusColorLight2,
                       ],
                     ),
                   ),
@@ -383,11 +320,11 @@ class CounterWidgetState extends State<CounterWidget> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: _getCounterColor(),
+                              color: statusColor,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: _getCounterColor().withValues(alpha: 0.3),
+                                  color: statusColor.withOpacity(0.3),
                                   spreadRadius: 0,
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
@@ -409,7 +346,7 @@ class CounterWidgetState extends State<CounterWidget> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
-                                  color: _getCounterColor(),
+                                  color: statusColor,
                                 ),
                               ),
                               Text(
@@ -425,14 +362,15 @@ class CounterWidgetState extends State<CounterWidget> {
                         ],
                       ),
                       const SizedBox(height: 24),
+                      // Large Counter Display
                       Container(
                         padding: const EdgeInsets.all(32),
                         decoration: BoxDecoration(
-                          color: _getCounterColor(),
+                          color: statusColor,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: _getCounterColor().withValues(alpha: 0.3),
+                              color: statusColor.withOpacity(0.3),
                               spreadRadius: 0,
                               blurRadius: 20,
                               offset: const Offset(0, 8),
@@ -456,7 +394,7 @@ class CounterWidgetState extends State<CounterWidget> {
 
               const SizedBox(height: 24),
 
-
+              // Progress Indicator (slider, disabled interaction)
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -475,23 +413,23 @@ class CounterWidgetState extends State<CounterWidget> {
                       const SizedBox(height: 16),
                       SliderTheme(
                         data: SliderTheme.of(context).copyWith(
-                          activeTrackColor: _getCounterColor(),
+                          activeTrackColor: statusColor,
                           inactiveTrackColor: Colors.grey[300],
-                          thumbColor: _getCounterColor(),
-                          overlayColor: _getCounterColor().withValues(alpha: 0.2),
-                          valueIndicatorColor: _getCounterColor(),
+                          thumbColor: statusColor,
+                          overlayColor: statusColor.withOpacity(0.2),
+                          valueIndicatorColor: statusColor,
                           thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
                           overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
                           trackHeight: 6,
-                          disabledActiveTrackColor: _getCounterColor(),
+                          disabledActiveTrackColor: statusColor,
                           disabledInactiveTrackColor: Colors.grey[300],
-                          disabledThumbColor: _getCounterColor(),
+                          disabledThumbColor: statusColor,
                         ),
                         child: Slider(
                           min: 0,
                           max: 100,
                           value: _counter.toDouble(),
-                          onChanged: null,
+                          onChanged: null, // disabled
                           divisions: 100,
                         ),
                       ),
@@ -502,8 +440,7 @@ class CounterWidgetState extends State<CounterWidget> {
 
               const SizedBox(height: 24),
 
-
-              // Control Buttons
+              // Mission Controls (big buttons)
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -559,9 +496,10 @@ class CounterWidgetState extends State<CounterWidget> {
 
               const SizedBox(height: 20),
 
-              // System Status Indicator
+              // System status legend
               _buildSystemStatusCard(),
 
+              // Ready banner if reached 100
               if (_counter == 100) ...[
                 const SizedBox(height: 20),
                 Card(
@@ -601,7 +539,7 @@ class CounterWidgetState extends State<CounterWidget> {
   }
 }
 
-
+/// Liftoff animation dialog
 class LiftoffAnimation extends StatefulWidget {
   final VoidCallback onClose;
 
@@ -621,19 +559,17 @@ class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerPr
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1400),
-    );
-
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
 
     _slideAnim = TweenSequence<Offset>([
       TweenSequenceItem(
-        tween: Tween(begin: const Offset(0, 0.6), end: const Offset(0, -0.25)).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(begin: const Offset(0, 0.6), end: const Offset(0, -0.25))
+            .chain(CurveTween(curve: Curves.easeOut)),
         weight: 80,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: const Offset(0, -0.25), end: const Offset(0, -0.5)).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(begin: const Offset(0, -0.25), end: const Offset(0, -0.5))
+            .chain(CurveTween(curve: Curves.easeInOut)),
         weight: 20,
       ),
     ]).animate(_controller);
@@ -642,9 +578,8 @@ class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerPr
         .chain(CurveTween(curve: Curves.easeOutBack))
         .animate(CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6)));
 
-    _flameAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.4, 1.0, curve: Curves.easeInOut)),
-    );
+    _flameAnim = Tween<double>(begin: 0.6, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: const Interval(0.4, 1.0, curve: Curves.easeInOut)));
 
     _controller.forward();
   }
@@ -669,11 +604,7 @@ class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerPr
                 color: Colors.white.withOpacity(0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.rocket_launch,
-                size: 52,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.rocket_launch, size: 52, color: Colors.white),
             ),
             const SizedBox(height: 8),
             AnimatedBuilder(
@@ -709,54 +640,32 @@ class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerPr
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1976D2),
-            Color(0xFF0D47A1),
-          ],
+          colors: [Color(0xFF1976D2), Color(0xFF0D47A1)],
         ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            height: 130,
-            child: Center(
-              child: _buildRocket(context),
-            ),
-          ),
+          SizedBox(height: 130, child: Center(child: _buildRocket(context))),
           const SizedBox(height: 8),
           const Text(
             'LIFTOFF SUCCESSFUL!',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
+            decoration: BoxDecoration(color: Colors.white.withOpacity(0.12), borderRadius: BorderRadius.circular(12)),
             child: const Text(
               'Mission Status: ACCOMPLISHED',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
             ),
           ),
           const SizedBox(height: 8),
           const Text(
             'Your rocket has successfully reached orbit!',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.white70,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.white70),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 18),
@@ -769,10 +678,7 @@ class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerPr
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               elevation: 4,
             ),
-            child: const Text(
-              'PREPARE NEXT MISSION',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
+            child: const Text('PREPARE NEXT MISSION', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           ),
         ],
       ),
