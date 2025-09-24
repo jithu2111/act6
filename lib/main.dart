@@ -206,8 +206,54 @@ class CounterWidgetState extends State<CounterWidget> {
               const SizedBox(height: 24),
 
 
+              Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Launch Preparation Progress',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          activeTrackColor: _getCounterColor(),
+                          inactiveTrackColor: Colors.grey[300],
+                          thumbColor: _getCounterColor(),
+                          overlayColor: _getCounterColor().withValues(alpha: 0.2),
+                          valueIndicatorColor: _getCounterColor(),
+                          thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 14),
+                          overlayShape: const RoundSliderOverlayShape(overlayRadius: 24),
+                          trackHeight: 6,
+                          disabledActiveTrackColor: _getCounterColor(),
+                          disabledInactiveTrackColor: Colors.grey[300],
+                          disabledThumbColor: _getCounterColor(),
+                        ),
+                        child: Slider(
+                          min: 0,
+                          max: 100,
+                          value: _counter.toDouble(),
+                          onChanged: null,
+                          divisions: 100,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+
               Container(
-                height: 100,
+                height: 120,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
@@ -215,7 +261,7 @@ class CounterWidgetState extends State<CounterWidget> {
                 ),
                 child: Center(
                   child: Text(
-                    'Progress Slider - Next Commit',
+                    'Control Buttons - Next Commit',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
