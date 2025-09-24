@@ -108,6 +108,88 @@ class CounterWidgetState extends State<CounterWidget> {
     );
   }
 
+  Widget _buildSystemStatusCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Text(
+              'System Status',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatusIndicator(
+                  'CRITICAL\n(0)',
+                  const Color(0xFFE53935),
+                  Icons.dangerous,
+                ),
+                _buildStatusIndicator(
+                  'STANDBY\n(1-25)',
+                  const Color(0xFFEF5350),
+                  Icons.battery_1_bar,
+                ),
+                _buildStatusIndicator(
+                  'INIT\n(26-50)',
+                  const Color(0xFFFFC107),
+                  Icons.battery_3_bar,
+                ),
+                _buildStatusIndicator(
+                  'FUELING\n(51-75)',
+                  const Color(0xFFFF9800),
+                  Icons.warning_amber,
+                ),
+                _buildStatusIndicator(
+                  'READY\n(76+)',
+                  const Color(0xFF43A047),
+                  Icons.rocket_launch,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusIndicator(String text, Color color, IconData icon) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 20,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 9,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -337,20 +419,40 @@ class CounterWidgetState extends State<CounterWidget> {
 
               const SizedBox(height: 20),
 
-              Container(
-                height: 150,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Center(
-                  child: Text(
-                    'System Status Dashboard - Next Commit',
-                    style: TextStyle(color: Colors.grey[600]),
+              // System Status Indicator
+              _buildSystemStatusCard(),
+
+              if (_counter == 100) ...[
+                const SizedBox(height: 20),
+                Card(
+                  elevation: 8,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.rocket_launch, color: Colors.white, size: 28),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'LAUNCH SEQUENCE READY!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
           ),
         ),
