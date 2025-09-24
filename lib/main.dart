@@ -74,17 +74,14 @@ class CounterWidgetState extends State<CounterWidget> {
 
   Color _getCounterColor() {
     if (_counter == 0) {
-      return const Color(0xFFE53935); // Critical Red
-    } else if (_counter > 75) {
-      return const Color(0xFF43A047); // Launch Green
+        return const Color(0xFFE53935); // Red
     } else if (_counter > 50) {
-      return const Color(0xFFFF9800); // Warning Orange
-    } else if (_counter > 25) {
-      return const Color(0xFFFFC107); // Caution Yellow
+        return const Color(0xFF43A047); // Green
     } else {
-      return const Color(0xFFEF5350); // Low Red
+        return const Color(0xFFFFC107); // Yellow (1..50)
     }
-  }
+    }
+
 
   IconData _getStatusIcon() {
     if (_counter == 0) {
@@ -116,104 +113,29 @@ class CounterWidgetState extends State<CounterWidget> {
     }
   }
 
+  Color _getNumberColor() {
+    if (_counter == 0) {
+      return const Color(0xFFE53935); // Red
+    } else if (_counter > 50) {
+      return const Color(0xFF43A047); // Green
+    } else {
+      return const Color(0xFFFFC107); // Yellow (for 1..50)
+    }
+  }
+
   void _showLiftoffDialog() {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 16,
-          child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF1976D2),
-                  Color(0xFF0D47A1),
-                ],
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.rocket_launch,
-                    size: 48,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'LIFTOFF SUCCESSFUL!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Mission Status: ACCOMPLISHED',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Your rocket has successfully reached orbit!',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    _resetCounter();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF0D47A1),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text(
-                    'PREPARE NEXT MISSION',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          child: LiftoffAnimation(
+            onClose: () {
+              Navigator.of(dialogContext).pop();
+              _resetCounter();
+            },
           ),
         );
       },
@@ -223,6 +145,7 @@ class CounterWidgetState extends State<CounterWidget> {
   @override
   Widget build(BuildContext context) {
     final Color statusColor = _getCounterColor();
+    final Color numberColor = _getNumberColor();
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -249,7 +172,6 @@ class CounterWidgetState extends State<CounterWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Status Display
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -278,7 +200,7 @@ class CounterWidgetState extends State<CounterWidget> {
                     style: TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      color: statusColor,
+                      color: numberColor,
                     ),
                   ),
                 ],
@@ -313,6 +235,185 @@ class CounterWidgetState extends State<CounterWidget> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+
+class LiftoffAnimation extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const LiftoffAnimation({super.key, required this.onClose});
+
+  @override
+  State<LiftoffAnimation> createState() => _LiftoffAnimationState();
+}
+
+class _LiftoffAnimationState extends State<LiftoffAnimation> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<Offset> _slideAnim;
+  late final Animation<double> _scaleAnim;
+  late final Animation<double> _flameAnim;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+
+
+    _slideAnim = TweenSequence<Offset>([
+      TweenSequenceItem(
+        tween: Tween(begin: const Offset(0, 0.6), end: const Offset(0, -0.25)).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 80,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: const Offset(0, -0.25), end: const Offset(0, -0.5)).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 20,
+      ),
+    ]).animate(_controller);
+
+    _scaleAnim = Tween<double>(begin: 0.9, end: 1.05)
+        .chain(CurveTween(curve: Curves.easeOutBack))
+        .animate(CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6)));
+
+    _flameAnim = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4, 1.0, curve: Curves.easeInOut)),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildRocket(BuildContext context) {
+    return SlideTransition(
+      position: _slideAnim,
+      child: ScaleTransition(
+        scale: _scaleAnim,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.rocket_launch,
+                size: 52,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 8),
+            AnimatedBuilder(
+              animation: _flameAnim,
+              builder: (context, child) {
+                final flameHeight = 10.0 * _flameAnim.value;
+                return Container(
+                  width: 8,
+                  height: flameHeight,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFFC107), Color(0xFFFF5722)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1976D2),
+            Color(0xFF0D47A1),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 130,
+            child: Center(
+              child: _buildRocket(context),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'LIFTOFF SUCCESSFUL!',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'Mission Status: ACCOMPLISHED',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Your rocket has successfully reached orbit!',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.white70,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 18),
+          ElevatedButton(
+            onPressed: widget.onClose,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF0D47A1),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              elevation: 4,
+            ),
+            child: const Text(
+              'PREPARE NEXT MISSION',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+          ),
+        ],
       ),
     );
   }
