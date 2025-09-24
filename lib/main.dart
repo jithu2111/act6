@@ -52,8 +52,7 @@ class CounterWidgetState extends State<CounterWidget> {
       if (_counter < 100) {
         _counter++;
         if (_counter == 100) {
-          // Will implement dialog in next commit
-          print('Launch Ready!');
+          _showLiftoffDialog();
         }
       }
     });
@@ -72,8 +71,6 @@ class CounterWidgetState extends State<CounterWidget> {
       _counter = 0;
     });
   }
-
-  // Added helper methods
 
   Color _getCounterColor() {
     if (_counter == 0) {
@@ -119,20 +116,123 @@ class CounterWidgetState extends State<CounterWidget> {
     }
   }
 
+  void _showLiftoffDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 16,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1976D2),
+                  Color(0xFF0D47A1),
+                ],
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.rocket_launch,
+                    size: 48,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'LIFTOFF SUCCESSFUL!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Mission Status: ACCOMPLISHED',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Your rocket has successfully reached orbit!',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    _resetCounter();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF0D47A1),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 4,
+                  ),
+                  child: const Text(
+                    'PREPARE NEXT MISSION',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final Color statusColor = _getCounterColor();
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.rocket_launch, color: Colors.white),
-            const SizedBox(width: 8),
-            const Text(
-              'MISSION CONTROL',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          children: const [
+            Icon(Icons.rocket_launch, color: Colors.white),
+            SizedBox(width: 8),
+            Text('MISSION CONTROL', style: TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         flexibleSpace: Container(
@@ -153,7 +253,7 @@ class CounterWidgetState extends State<CounterWidget> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _getCounterColor().withOpacity(0.1),
+                color: statusColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -161,7 +261,7 @@ class CounterWidgetState extends State<CounterWidget> {
                   Icon(
                     _getStatusIcon(),
                     size: 48,
-                    color: _getCounterColor(),
+                    color: statusColor,
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -169,7 +269,7 @@ class CounterWidgetState extends State<CounterWidget> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: _getCounterColor(),
+                      color: statusColor,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -178,7 +278,7 @@ class CounterWidgetState extends State<CounterWidget> {
                     style: TextStyle(
                       fontSize: 64,
                       fontWeight: FontWeight.bold,
-                      color: _getCounterColor(),
+                      color: statusColor,
                     ),
                   ),
                 ],
